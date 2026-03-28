@@ -1,182 +1,109 @@
 # Refatoracao SOLID - Olimpiadas
 
-## Objetivo
-Documentar de forma detalhada quais principios SOLID foram aplicados na refatoracao e em quais arquivos cada principio aparece.
+## 1. Resumo rapido 
+Este projeto era centralizado em uma unica classe (`App`) e foi dividido em camadas para aplicar SOLID.
 
-## Contexto da refatoracao
-Na versao original, a classe `App` concentrava quase todas as responsabilidades:
-- interface de console;
-- validacoes de entrada;
-- regras de negocio;
-- persistencia em listas;
-- geracao de IDs;
-- carga inicial (seed);
-- impressao do tabuleiro FEN.
+Hoje:
+- `App` cuida so do menu/console;
+- `service` cuida das regras de negocio;
+- `repository` cuida do acesso a dados;
+- `ui/FenBoardPrinter` cuida da exibicao do tabuleiro.
 
-Esse desenho gerava alto acoplamento e dificultava manutencao e testes.
+## 2. Antes e depois
 
-## Mapa de principios SOLID por arquivo
+### Antes
+- Uma classe fazia tudo.
+- Alto acoplamento.
+- Dificil de testar.
 
-### S - Single Responsibility Principle (SRP)
-Cada classe passou a ter uma unica responsabilidade principal.
+### Depois
+- Responsabilidades separadas.
+- Regras de negocio isoladas.
+- Mais facil de manter e evoluir.
 
-Arquivos e aplicacao:
+## 3. SOLID aplicado 
 
-1. `src/main/java/br/com/ucsal/olimpiadas/App.java`
-- Responsabilidade: apenas fluxo de menu e interacao com usuario.
-- O que foi removido da App: regras de negocio, seed, geracao de ID e detalhes de persistencia.
+### S - Single Responsibility Principle
+Ideia: cada classe deve ter uma responsabilidade.
 
-2. `src/main/java/br/com/ucsal/olimpiadas/service/CadastroService.java`
-- Responsabilidade: casos de uso de cadastro (participante, prova, questao) e validacoes relacionadas.
+Arquivos onde foi aplicado:
+- `src/main/java/br/com/ucsal/olimpiadas/App.java` -> apenas interface de console.
+- `src/main/java/br/com/ucsal/olimpiadas/service/CadastroService.java` -> cadastro e validacoes.
+- `src/main/java/br/com/ucsal/olimpiadas/service/TentativaService.java` -> aplicar prova, corrigir e calcular nota.
+- `src/main/java/br/com/ucsal/olimpiadas/service/SeedService.java` -> dados iniciais.
+- `src/main/java/br/com/ucsal/olimpiadas/service/IdGeneratorService.java` -> IDs.
+- `src/main/java/br/com/ucsal/olimpiadas/ui/FenBoardPrinter.java` -> impressao de FEN.
 
-3. `src/main/java/br/com/ucsal/olimpiadas/service/TentativaService.java`
-- Responsabilidade: casos de uso de aplicacao da prova (buscar questoes, corrigir resposta, registrar tentativa, calcular nota).
 
-4. `src/main/java/br/com/ucsal/olimpiadas/service/SeedService.java`
-- Responsabilidade: carga de dados iniciais.
+### O - Open/Closed Principle
+Ideia: aberto para extensao, fechado para modificacao.
 
-5. `src/main/java/br/com/ucsal/olimpiadas/service/IdGeneratorService.java`
-- Responsabilidade: gerar IDs sequenciais para entidades.
-
-6. `src/main/java/br/com/ucsal/olimpiadas/ui/FenBoardPrinter.java`
-- Responsabilidade: transformar FEN em representacao textual do tabuleiro no console.
-
-7. Repositorios em `src/main/java/br/com/ucsal/olimpiadas/repository/*`
-- Responsabilidade: contrato de acesso a dados, sem regra de negocio.
-
-8. Implementacoes em memoria em `src/main/java/br/com/ucsal/olimpiadas/repository/memory/*`
-- Responsabilidade: estrategia de armazenamento em memoria.
-
-Resultado SRP:
-- classes menores, mais coesas, com motivo de mudanca mais claro.
-
-### O - Open/Closed Principle (OCP)
-O sistema foi aberto para extensao e fechado para modificacao no nucleo de regras.
-
-Arquivos e aplicacao:
-
-1. `src/main/java/br/com/ucsal/olimpiadas/repository/ParticipanteRepository.java`
-2. `src/main/java/br/com/ucsal/olimpiadas/repository/ProvaRepository.java`
-3. `src/main/java/br/com/ucsal/olimpiadas/repository/QuestaoRepository.java`
-4. `src/main/java/br/com/ucsal/olimpiadas/repository/TentativaRepository.java`
-
-Como OCP foi aplicado:
-- os servicos usam interfaces de repositorio;
-- novas formas de persistencia (ex.: banco relacional, arquivo) podem ser adicionadas criando novas implementacoes sem alterar `CadastroService` e `TentativaService`.
-
-Implementacao atual usada como extensao:
-- `src/main/java/br/com/ucsal/olimpiadas/repository/memory/InMemoryParticipanteRepository.java`
-- `src/main/java/br/com/ucsal/olimpiadas/repository/memory/InMemoryProvaRepository.java`
-- `src/main/java/br/com/ucsal/olimpiadas/repository/memory/InMemoryQuestaoRepository.java`
-- `src/main/java/br/com/ucsal/olimpiadas/repository/memory/InMemoryTentativaRepository.java`
-
-### L - Liskov Substitution Principle (LSP)
-As implementacoes concretas podem substituir suas abstrações sem alterar comportamento esperado dos servicos.
-
-Arquivos e aplicacao:
-
-1. Contratos:
+Arquivos onde foi aplicado:
 - `src/main/java/br/com/ucsal/olimpiadas/repository/ParticipanteRepository.java`
 - `src/main/java/br/com/ucsal/olimpiadas/repository/ProvaRepository.java`
 - `src/main/java/br/com/ucsal/olimpiadas/repository/QuestaoRepository.java`
 - `src/main/java/br/com/ucsal/olimpiadas/repository/TentativaRepository.java`
 
-2. Substitutos concretos:
+Implementacao atual:
 - `src/main/java/br/com/ucsal/olimpiadas/repository/memory/InMemoryParticipanteRepository.java`
 - `src/main/java/br/com/ucsal/olimpiadas/repository/memory/InMemoryProvaRepository.java`
 - `src/main/java/br/com/ucsal/olimpiadas/repository/memory/InMemoryQuestaoRepository.java`
 - `src/main/java/br/com/ucsal/olimpiadas/repository/memory/InMemoryTentativaRepository.java`
 
-3. Classes consumidoras:
-- `src/main/java/br/com/ucsal/olimpiadas/service/CadastroService.java`
-- `src/main/java/br/com/ucsal/olimpiadas/service/TentativaService.java`
 
-Como LSP foi aplicado:
-- `CadastroService` e `TentativaService` nao dependem de detalhes internos das implementacoes;
-- qualquer classe que respeite a interface pode substituir a implementacao atual.
 
-### I - Interface Segregation Principle (ISP)
-Foram criadas interfaces pequenas e especificas ao inves de uma interface unica grande.
+### L - Liskov Substitution Principle
+Ideia: implementacoes devem poder substituir suas interfaces sem quebrar o sistema.
 
-Arquivos e aplicacao:
+Arquivos onde foi aplicado:
+- Interfaces em `repository/*`.
+- Implementacoes em `repository/memory/*`.
+- Consumo nas regras:
+  - `src/main/java/br/com/ucsal/olimpiadas/service/CadastroService.java`
+  - `src/main/java/br/com/ucsal/olimpiadas/service/TentativaService.java`
 
-1. `src/main/java/br/com/ucsal/olimpiadas/repository/ParticipanteRepository.java`
-- Metodos apenas para operacoes de participante.
 
-2. `src/main/java/br/com/ucsal/olimpiadas/repository/ProvaRepository.java`
-- Metodos apenas para operacoes de prova.
+### I - Interface Segregation Principle
+Ideia: interfaces pequenas e especificas.
 
-3. `src/main/java/br/com/ucsal/olimpiadas/repository/QuestaoRepository.java`
-- Metodos apenas para operacoes de questao (incluindo busca por prova).
-
-4. `src/main/java/br/com/ucsal/olimpiadas/repository/TentativaRepository.java`
-- Metodos apenas para operacoes de tentativa.
-
-Como ISP foi aplicado:
-- consumidores dependem so do que usam;
-- evita obrigar implementacoes a suportar metodos que nao fazem sentido para aquele agregado.
-
-### D - Dependency Inversion Principle (DIP)
-As regras de alto nivel dependem de abstrações, nao de detalhes concretos.
-
-Arquivos e aplicacao:
-
-1. Alto nivel (regras):
-- `src/main/java/br/com/ucsal/olimpiadas/service/CadastroService.java`
-- `src/main/java/br/com/ucsal/olimpiadas/service/TentativaService.java`
-
-2. Abstracoes:
-- interfaces em `src/main/java/br/com/ucsal/olimpiadas/repository/*`
-
-3. Detalhes concretos:
-- implementacoes em `src/main/java/br/com/ucsal/olimpiadas/repository/memory/*`
-
-4. Composicao das dependencias:
-- `src/main/java/br/com/ucsal/olimpiadas/App.java`
-
-Como DIP foi aplicado:
-- `App` instancia implementacoes concretas e injeta nos servicos;
-- servicos seguem independentes da tecnologia de persistencia.
-
-## Evidencias de melhoria apos SOLID
-
-1. Menor acoplamento
-- Regras de negocio nao ficam mais presas ao console nem a listas estaticas.
-
-2. Maior testabilidade
-- Testes focam casos de uso sem depender da interface de entrada:
-  - `src/test/java/br/com/ucsal/olimpiadas/CadastroServiceTest.java`
-  - `src/test/java/br/com/ucsal/olimpiadas/TentativaServiceTest.java`
-
-3. Maior extensibilidade
-- Troca de persistencia pode ser feita por nova implementacao de repositorio.
-
-## Lista consolidada de arquivos SOLID
-
-Camada de interface:
-- `src/main/java/br/com/ucsal/olimpiadas/App.java`
-
-Camada de servicos:
-- `src/main/java/br/com/ucsal/olimpiadas/service/CadastroService.java`
-- `src/main/java/br/com/ucsal/olimpiadas/service/TentativaService.java`
-- `src/main/java/br/com/ucsal/olimpiadas/service/SeedService.java`
-- `src/main/java/br/com/ucsal/olimpiadas/service/IdGeneratorService.java`
-
-Camada de repositorios (abstracoes):
+Arquivos onde foi aplicado:
 - `src/main/java/br/com/ucsal/olimpiadas/repository/ParticipanteRepository.java`
 - `src/main/java/br/com/ucsal/olimpiadas/repository/ProvaRepository.java`
 - `src/main/java/br/com/ucsal/olimpiadas/repository/QuestaoRepository.java`
 - `src/main/java/br/com/ucsal/olimpiadas/repository/TentativaRepository.java`
 
-Camada de repositorios (detalhes in-memory):
-- `src/main/java/br/com/ucsal/olimpiadas/repository/memory/InMemoryParticipanteRepository.java`
-- `src/main/java/br/com/ucsal/olimpiadas/repository/memory/InMemoryProvaRepository.java`
-- `src/main/java/br/com/ucsal/olimpiadas/repository/memory/InMemoryQuestaoRepository.java`
-- `src/main/java/br/com/ucsal/olimpiadas/repository/memory/InMemoryTentativaRepository.java`
 
-Utilitario de UI:
-- `src/main/java/br/com/ucsal/olimpiadas/ui/FenBoardPrinter.java`
 
-Testes de regra de negocio:
+### D - Dependency Inversion Principle
+Ideia: regras de negocio dependem de abstracoes, nao de implementacoes.
+
+Arquivos onde foi aplicado:
+- Regras (alto nivel):
+  - `src/main/java/br/com/ucsal/olimpiadas/service/CadastroService.java`
+  - `src/main/java/br/com/ucsal/olimpiadas/service/TentativaService.java`
+- Abstracoes:
+  - `src/main/java/br/com/ucsal/olimpiadas/repository/*`
+- Implementacoes concretas:
+  - `src/main/java/br/com/ucsal/olimpiadas/repository/memory/*`
+- Composicao/injecao:
+  - `src/main/java/br/com/ucsal/olimpiadas/App.java`
+
+
+
+## 4. Ganhos praticos
+- Codigo mais organizado.
+- Mais facil de testar.
+- Mais facil de evoluir (ex.: trocar persistencia).
+
+Testes adicionados:
 - `src/test/java/br/com/ucsal/olimpiadas/CadastroServiceTest.java`
 - `src/test/java/br/com/ucsal/olimpiadas/TentativaServiceTest.java`
+
+## 5. Roteiro curto de apresentacao
+1. "Problema inicial: App fazia tudo."
+2. "Separacao por camadas: App, Service, Repository e UI."
+3. "Mostrar SOLID com um exemplo por principio."
+4. "Fechar com ganhos: manutencao, testes e extensao."
+
+
+## 6. Nesse projeto foi usado o GithubCopilot
