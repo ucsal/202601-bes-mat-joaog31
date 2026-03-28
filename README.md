@@ -89,21 +89,9 @@ Arquivos onde foi aplicado:
   - `src/main/java/br/com/ucsal/olimpiadas/App.java`
 
 
-
-## 4. Ganhos praticos
-- Codigo mais organizado.
-- Mais facil de testar.
-- Mais facil de evoluir (ex.: trocar persistencia).
-
 Testes adicionados:
 - `src/test/java/br/com/ucsal/olimpiadas/CadastroServiceTest.java`
 - `src/test/java/br/com/ucsal/olimpiadas/TentativaServiceTest.java`
 
-## 5. Roteiro curto de apresentacao
-1. "Problema inicial: App fazia tudo."
-2. "Separacao por camadas: App, Service, Repository e UI."
-3. "Mostrar SOLID com um exemplo por principio."
-4. "Fechar com ganhos: manutencao, testes e extensao."
 
-
-## 6. Nesse projeto foi usado o GithubCopilot
+## 5. Nesse projeto foi usado o GithubCopilot
