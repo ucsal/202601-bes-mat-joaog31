@@ -4,10 +4,18 @@
 Este projeto era centralizado em uma unica classe (`App`) e foi dividido em camadas para aplicar SOLID.
 
 Hoje:
-- `App` cuida so do menu/console;
+- `App` cuida so do bootstrap (montagem das dependencias) e da delegacao do menu;
 - `service` cuida das regras de negocio;
 - `repository` cuida do acesso a dados;
-- `ui/FenBoardPrinter` cuida da exibicao do tabuleiro.
+- `ui` cuida da interacao de console e exibicao.
+
+Com a ultima refatoracao, as responsabilidades de console que estavam no `App` foram separadas em handlers:
+- `src/main/java/br/com/ucsal/olimpiadas/ui/ParticipanteConsoleHandler.java`
+- `src/main/java/br/com/ucsal/olimpiadas/ui/ProvaConsoleHandler.java`
+- `src/main/java/br/com/ucsal/olimpiadas/ui/QuestaoConsoleHandler.java`
+- `src/main/java/br/com/ucsal/olimpiadas/ui/TentativaConsoleHandler.java`
+- `src/main/java/br/com/ucsal/olimpiadas/ui/SelecaoConsoleHelper.java`
+- `src/main/java/br/com/ucsal/olimpiadas/ui/FenBoardPrinter.java`
 
 ## 2. Antes e depois
 
@@ -20,6 +28,7 @@ Hoje:
 - Responsabilidades separadas.
 - Regras de negocio isoladas.
 - Mais facil de manter e evoluir.
+- `App` ficou menor e com menos acoplamento com detalhes de entrada/saida.
 
 ## 3. SOLID aplicado 
 
@@ -27,11 +36,16 @@ Hoje:
 Ideia: cada classe deve ter uma responsabilidade.
 
 Arquivos onde foi aplicado:
-- `src/main/java/br/com/ucsal/olimpiadas/App.java` -> apenas interface de console.
+- `src/main/java/br/com/ucsal/olimpiadas/App.java` -> composicao das dependencias e delegacao do menu.
 - `src/main/java/br/com/ucsal/olimpiadas/service/CadastroService.java` -> cadastro e validacoes.
 - `src/main/java/br/com/ucsal/olimpiadas/service/TentativaService.java` -> aplicar prova, corrigir e calcular nota.
 - `src/main/java/br/com/ucsal/olimpiadas/service/SeedService.java` -> dados iniciais.
 - `src/main/java/br/com/ucsal/olimpiadas/service/IdGeneratorService.java` -> IDs.
+- `src/main/java/br/com/ucsal/olimpiadas/ui/ParticipanteConsoleHandler.java` -> fluxo de cadastro de participante no console.
+- `src/main/java/br/com/ucsal/olimpiadas/ui/ProvaConsoleHandler.java` -> fluxo de cadastro de prova no console.
+- `src/main/java/br/com/ucsal/olimpiadas/ui/QuestaoConsoleHandler.java` -> fluxo de cadastro de questao no console.
+- `src/main/java/br/com/ucsal/olimpiadas/ui/TentativaConsoleHandler.java` -> fluxo de aplicacao e listagem de tentativas.
+- `src/main/java/br/com/ucsal/olimpiadas/ui/SelecaoConsoleHelper.java` -> selecao de participante/prova no console.
 - `src/main/java/br/com/ucsal/olimpiadas/ui/FenBoardPrinter.java` -> impressao de FEN.
 
 
@@ -88,10 +102,15 @@ Arquivos onde foi aplicado:
 - Composicao/injecao:
   - `src/main/java/br/com/ucsal/olimpiadas/App.java`
 
+Observacao: no `App` ainda existe composicao manual com `new` (composition root), o que e aceitavel para esse porte de projeto.
+
 
 Testes adicionados:
 - `src/test/java/br/com/ucsal/olimpiadas/CadastroServiceTest.java`
 - `src/test/java/br/com/ucsal/olimpiadas/TentativaServiceTest.java`
+
+Status apos refatoracao do App:
+- Testes executados com sucesso: 8 passando, 0 falhas.
 
 
 ## 5. Nesse projeto foi usado o GithubCopilot
